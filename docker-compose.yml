@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rrhh_frontend_standalone
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    environment:
+      # Si el backend corre en tu máquina (fuera de Docker):
+      # NEXT_PUBLIC_API_BASE_URL: "http://host.docker.internal:4000"
+      #
+      # Si el backend corre en otro contenedor dentro de una red/compose:
+      # NEXT_PUBLIC_API_BASE_URL: "http://backend:4000"
+      #
+      # Por defecto, lo dejamos para desarrollo local típico:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://host.docker.internal:4000}
+    volumes:
+      - .:/app
+      - frontend_node_modules:/app/node_modules
+
+volumes:
+  frontend_node_modules:

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../rrhh-backend/.idea/rrhh-backend.iml" filepath="$PROJECT_DIR$/../rrhh-backend/.idea/rrhh-backend.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/rrhh-frontend.iml" filepath="$PROJECT_DIR$/.idea/rrhh-frontend.iml" />
     </modules>
   </component>

@@ -1,7 +1,10 @@
+// src/components/Sidebar.tsx
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+
 import {
     Avatar,
     Box,
@@ -16,6 +19,7 @@ import {
     Toolbar,
     Typography,
 } from '@mui/material';
+
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -40,50 +44,46 @@ type NavItem = {
     roles: Rol[];
 };
 
-// Config de navegación por rol
 const NAV_ITEMS: NavItem[] = [
     {
         key: 'dashboard',
         label: 'Dashboard',
         href: '/dashboard',
-        icon: <DashboardIcon />,
+        icon: <DashboardIcon fontSize="small" />,
         roles: ['ADMIN', 'RRHH', 'FUNCIONARIO'],
     },
     {
         key: 'asistencia',
         label: 'Mis asistencias',
         href: '/asistencia',
-        icon: <AccessTimeIcon />,
+        icon: <AccessTimeIcon fontSize="small" />,
         roles: ['ADMIN', 'RRHH', 'FUNCIONARIO'],
     },
     {
         key: 'permisos',
         label: 'Permisos',
         href: '/permisos',
-        icon: <EventNoteIcon />,
+        icon: <EventNoteIcon fontSize="small" />,
         roles: ['ADMIN', 'RRHH', 'FUNCIONARIO'],
     },
     {
         key: 'usuarios',
         label: 'Usuarios',
         href: '/usuarios',
-        icon: <PeopleIcon />,
-        roles: ['ADMIN', 'RRHH'], // Solo admin + RRHH
+        icon: <PeopleIcon fontSize="small" />,
+        roles: ['ADMIN', 'RRHH'],
     },
 ];
 
-export default function Sidebar({
-                                    usuarioNombre,
-                                    usuarioRol,
-                                    onLogout,
-                                }: SidebarProps) {
+export default function Sidebar({ usuarioNombre, usuarioRol, onLogout }: SidebarProps) {
     const pathname = usePathname();
 
-    const itemsVisibles = NAV_ITEMS.filter((item) =>
-        item.roles.includes(usuarioRol),
+    const itemsVisibles = React.useMemo(
+        () => NAV_ITEMS.filter((item) => item.roles.includes(usuarioRol)),
+        [usuarioRol],
     );
 
-    const inicial = usuarioNombre.charAt(0).toUpperCase() || 'U';
+    const inicial = (usuarioNombre?.trim()?.charAt(0) || 'U').toUpperCase();
 
     return (
         <Drawer
@@ -94,43 +94,41 @@ export default function Sidebar({
                 '& .MuiDrawer-paper': {
                     width: SIDEBAR_WIDTH,
                     boxSizing: 'border-box',
+                    borderRightColor: 'divider',
                 },
             }}
         >
             <Toolbar />
+
             <Box
                 sx={{
-                    overflow: 'auto',
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                 }}
             >
-                {/* Perfil arriba */}
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        px: 2,
-                        py: 2,
-                        gap: 2,
-                    }}
-                >
-                    <ListItemAvatar>
-                        <Avatar sx={{ width: 48, height: 48 }}>{inicial}</Avatar>
-                    </ListItemAvatar>
-                    <Box>
-                        <Typography variant="subtitle1">{usuarioNombre}</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            {usuarioRol}
-                        </Typography>
+                {/* Perfil */}
+                <Box sx={{ px: 2, pt: 2, pb: 1.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <ListItemAvatar sx={{ minWidth: 'auto' }}>
+                            <Avatar sx={{ width: 44, height: 44 }}>{inicial}</Avatar>
+                        </ListItemAvatar>
+
+                        <Box sx={{ minWidth: 0 }}>
+                            <Typography variant="subtitle1" noWrap>
+                                {usuarioNombre || 'Usuario'}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" noWrap>
+                                {usuarioRol}
+                            </Typography>
+                        </Box>
                     </Box>
                 </Box>
 
                 <Divider />
 
-                {/* Menú de navegación */}
-                <List>
+                {/* Menú */}
+                <List sx={{ px: 1, py: 1 }}>
                     {itemsVisibles.map((item) => {
                         const selected =
                             pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -141,6 +139,24 @@ export default function Sidebar({
                                 component={Link}
                                 href={item.href}
                                 selected={selected}
+                                sx={{
+                                    borderRadius: 2,
+                                    mx: 0.5,
+                                    my: 0.25,
+                                    '& .MuiListItemIcon-root': {
+                                        minWidth: 36,
+                                        color: selected ? 'primary.main' : 'text.secondary',
+                                    },
+                                    '& .MuiListItemText-primary': {
+                                        fontWeight: selected ? 600 : 500,
+                                    },
+                                    '&.Mui-selected': {
+                                        bgcolor: 'action.selected',
+                                    },
+                                    '&.Mui-selected:hover': {
+                                        bgcolor: 'action.selected',
+                                    },
+                                }}
                             >
                                 <ListItemIcon>{item.icon}</ListItemIcon>
                                 <ListItemText primary={item.label} />
@@ -149,7 +165,7 @@ export default function Sidebar({
                     })}
                 </List>
 
-                {/* Botón de logout abajo */}
+                {/* Logout abajo */}
                 <Box sx={{ mt: 'auto', p: 2 }}>
                     <Button
                         variant="outlined"
@@ -157,6 +173,7 @@ export default function Sidebar({
                         fullWidth
                         startIcon={<LogoutIcon />}
                         onClick={onLogout}
+                        sx={{ borderRadius: 2 }}
                     >
                         Cerrar sesión
                     </Button>
